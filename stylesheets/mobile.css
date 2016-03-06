@@ -1,0 +1,39 @@
+@media only screen 
+and (min-device-width : 320px)
+and (max-device-width : 667px)
+and (orientation : portrait)
+{
+    .contact {
+        width : 50px;
+        height: 50px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+        border-radius: 10px;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+        -moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+        float: left;
+        margin-right:20px;
+        background: url(../images/logos.jpg) no-repeat;
+    }
+
+    .linkedin {
+        background-position: -3px -58px;
+        background-size: 222%;
+    }
+
+    .mail {
+        background-position: -19px -18px;
+        background-size: 350%;
+    }
+
+    .skype {
+        background-position: -88px -11px;
+        background-size: 300%;
+    }
+
+    .twitter {
+        background-position: -52px -52px;
+        background-size: 205%;
+    }
+}

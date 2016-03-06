@@ -1,10 +1,7 @@
-.circleBase {
+.avatar {
     border-radius: 50%;
     margin: auto;
     behavior: url(PIE.htc); /* remove if you don't care about IE8 */
-}
-
-.type1 {
 	width: 110px;
     height: 110px;
     background: url(../images/avatar.jpg) no-repeat;
@@ -16,5 +13,44 @@
 	box-shadow: 0 0 8px rgba(0, 0, 0, .8);
 	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
 	-moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+}
+
+.contact {
+    width : 70px;
+    height: 70px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+    float: left;
+    margin-right:20px;
+    background: url(../images/logos.jpg) no-repeat;
+}
+
+.linkedin {
+    background-position: -3px -80px;
+    background-size: 220%;
+}
+
+.mail {
+    background-position: -27px -25px;
+    background-size: 350%;
+}
+
+.skype {
+    background-position: -122px -17px;
+    background-size: 300%;
+}
+
+.twitter {
+    background-position: -73px -73px;
+    background-size: 205%;
+}
+
+.site-footer {
+    text-align:center;
+    font-size: 13px;
 }
 
