@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final stockInBags = _statistics?.stockInBags ?? 0;
     final daysRemaining = _statistics?.daysRemaining ?? 0;
 
-    Color stockColor = Colors.green;
+    MaterialColor stockColor = Colors.green;
     IconData stockIcon = Icons.check_circle;
     String stockStatus = 'Bon niveau';
 
