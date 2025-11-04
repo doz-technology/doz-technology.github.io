@@ -35,7 +35,6 @@ class _AddStockScreenState extends State<AddStockScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
-      locale: const Locale('fr', 'FR'),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {

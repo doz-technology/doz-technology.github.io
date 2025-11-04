@@ -44,7 +44,6 @@ class _AddConsumptionScreenState extends State<AddConsumptionScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
-      locale: const Locale('fr', 'FR'),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
