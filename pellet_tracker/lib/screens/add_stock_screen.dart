@@ -13,20 +13,32 @@ class AddStockScreen extends StatefulWidget {
 
 class _AddStockScreenState extends State<AddStockScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
   final _noteController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
-  bool _isInBags = true; // true = sacs, false = kg
+  int _numberOfBags = 1; // Nombre de sacs achetés
   bool _isSaving = false;
 
   @override
   void dispose() {
-    _quantityController.dispose();
     _priceController.dispose();
     _noteController.dispose();
     super.dispose();
+  }
+
+  void _incrementBags() {
+    setState(() {
+      _numberOfBags++;
+    });
+  }
+
+  void _decrementBags() {
+    if (_numberOfBags > 1) {
+      setState(() {
+        _numberOfBags--;
+      });
+    }
   }
 
   Future<void> _selectDate() async {
@@ -44,18 +56,15 @@ class _AddStockScreenState extends State<AddStockScreen> {
   }
 
   Future<void> _saveTransaction() async {
-    if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isSaving = true);
 
     try {
-      final quantity = double.parse(_quantityController.text);
-      final quantityInKg = _isInBags ? quantity * 15 : quantity;
+      final quantityInKg = _numberOfBags * 15.0;
 
       double? pricePerKg;
       if (_priceController.text.isNotEmpty) {
-        final price = double.parse(_priceController.text.replaceAll(',', '.'));
-        pricePerKg = _isInBags ? price / 15 : price;
+        final pricePerBag = double.parse(_priceController.text.replaceAll(',', '.'));
+        pricePerKg = pricePerBag / 15;
       }
 
       final transaction = PelletTransaction(
@@ -73,7 +82,7 @@ class _AddStockScreenState extends State<AddStockScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Stock ajouté : ${quantityInKg.toStringAsFixed(0)} kg',
+              'Stock ajouté : $_numberOfBags sac${_numberOfBags > 1 ? 's' : ''} (${quantityInKg.toStringAsFixed(0)} kg)',
             ),
             backgroundColor: Colors.green,
           ),
@@ -110,74 +119,117 @@ class _AddStockScreenState extends State<AddStockScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             Card(
+              elevation: 4,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(24),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Quantité',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: SegmentedButton<bool>(
-                            segments: const [
-                              ButtonSegment(
-                                value: true,
-                                label: Text('Sacs (15kg)'),
-                                icon: Icon(Icons.shopping_bag),
-                              ),
-                              ButtonSegment(
-                                value: false,
-                                label: Text('Kilogrammes'),
-                                icon: Icon(Icons.scale),
-                              ),
-                            ],
-                            selected: {_isInBags},
-                            onSelectionChanged: (Set<bool> newSelection) {
-                              setState(() {
-                                _isInBags = newSelection.first;
-                              });
-                            },
+                        Icon(
+                          Icons.add_shopping_cart,
+                          size: 32,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Achat de pellets',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _quantityController,
-                      decoration: InputDecoration(
-                        labelText: _isInBags ? 'Nombre de sacs' : 'Poids (kg)',
-                        prefixIcon: const Icon(Icons.inventory),
-                        border: const OutlineInputBorder(),
-                        helperText: _isInBags
-                            ? '1 sac = 15 kg'
-                            : 'Entrez le poids total',
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d+\.?\d{0,2}'),
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton.filled(
+                          onPressed: _decrementBags,
+                          icon: const Icon(Icons.remove),
+                          iconSize: 32,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.green[100],
+                            foregroundColor: Colors.green[900],
+                            minimumSize: const Size(60, 60),
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green[50],
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.green[300]!,
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '$_numberOfBags',
+                                style: TextStyle(
+                                  fontSize: 64,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green[700],
+                                ),
+                              ),
+                              Text(
+                                'sac${_numberOfBags > 1 ? 's' : ''}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${_numberOfBags * 15} kg',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.green[800],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        IconButton.filled(
+                          onPressed: _incrementBags,
+                          icon: const Icon(Icons.add),
+                          iconSize: 32,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.green[700],
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(60, 60),
+                          ),
                         ),
                       ],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer une quantité';
-                        }
-                        final num = double.tryParse(value);
-                        if (num == null || num <= 0) {
-                          return 'Veuillez entrer un nombre valide';
-                        }
-                        return null;
-                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Utilisez + ou - pour ajuster',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ],
                 ),
@@ -200,10 +252,10 @@ class _AddStockScreenState extends State<AddStockScreen> {
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _priceController,
-                      decoration: InputDecoration(
-                        labelText: _isInBags ? 'Prix par sac (€)' : 'Prix par kg (€)',
-                        prefixIcon: const Icon(Icons.euro),
-                        border: const OutlineInputBorder(),
+                      decoration: const InputDecoration(
+                        labelText: 'Prix par sac (€)',
+                        prefixIcon: Icon(Icons.euro),
+                        border: OutlineInputBorder(),
                         helperText: 'Pour calculer les dépenses totales',
                       ),
                       keyboardType: const TextInputType.numberWithOptions(
