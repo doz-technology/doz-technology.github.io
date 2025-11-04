@@ -282,43 +282,48 @@ class _AddConsumptionScreenState extends State<AddConsumptionScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: (_numberOfBags * 15 > _currentStock)
-                            ? Colors.red[50]
-                            : Colors.blue[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: (_numberOfBags * 15 > _currentStock)
-                              ? Colors.red[300]!
-                              : Colors.blue[300]!,
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            (_numberOfBags * 15 > _currentStock)
-                                ? Icons.warning_amber
-                                : Icons.inventory_2,
-                            size: 20,
+                        decoration: BoxDecoration(
+                          color: (_numberOfBags * 15 > _currentStock)
+                              ? Colors.red[50]
+                              : Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
                             color: (_numberOfBags * 15 > _currentStock)
-                                ? Colors.red[700]
-                                : Colors.blue[700],
+                                ? Colors.red[300]!
+                                : Colors.blue[300]!,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Stock disponible : ${_currentStock.toStringAsFixed(0)} kg',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              (_numberOfBags * 15 > _currentStock)
+                                  ? Icons.warning_amber
+                                  : Icons.inventory_2,
+                              size: 18,
                               color: (_numberOfBags * 15 > _currentStock)
                                   ? Colors.red[700]
                                   : Colors.blue[700],
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Text(
+                              'Stock : ${_currentStock.toStringAsFixed(0)} kg',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: (_numberOfBags * 15 > _currentStock)
+                                    ? Colors.red[700]
+                                    : Colors.blue[700],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
