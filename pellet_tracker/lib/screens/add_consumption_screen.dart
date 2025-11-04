@@ -17,6 +17,22 @@ class _AddConsumptionScreenState extends State<AddConsumptionScreen> {
   DateTime _selectedDate = DateTime.now();
   int _numberOfBags = 1; // Nombre de sacs consommés
   bool _isSaving = false;
+  double _currentStock = 0; // Stock actuel en kg
+  StorageService? _storageService;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentStock();
+  }
+
+  Future<void> _loadCurrentStock() async {
+    _storageService = await StorageService.init();
+    final stock = _storageService!.calculateCurrentStock();
+    setState(() {
+      _currentStock = stock;
+    });
+  }
 
   @override
   void dispose() {
@@ -53,11 +69,55 @@ class _AddConsumptionScreenState extends State<AddConsumptionScreen> {
   }
 
   Future<void> _saveTransaction() async {
+    final quantityInKg = _numberOfBags * 15.0;
+
+    // Vérifier si le stock est suffisant
+    if (quantityInKg > _currentStock) {
+      if (mounted) {
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Stock insuffisant'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Vous essayez de consommer $_numberOfBags sac${_numberOfBags > 1 ? 's' : ''} (${quantityInKg.toStringAsFixed(0)} kg)',
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Stock disponible : ${_currentStock.toStringAsFixed(0)} kg (≈ ${(_currentStock / 15).toStringAsFixed(1)} sacs)',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Voulez-vous quand même enregistrer cette consommation ?',
+                  style: TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.orange),
+                child: const Text('Continuer'),
+              ),
+            ],
+          ),
+        );
+
+        if (confirm != true) return;
+      }
+    }
+
     setState(() => _isSaving = true);
 
     try {
-      final quantityInKg = _numberOfBags * 15.0;
-
       final transaction = PelletTransaction(
         type: TransactionType.consommation,
         quantity: quantityInKg,
@@ -65,7 +125,7 @@ class _AddConsumptionScreenState extends State<AddConsumptionScreen> {
         note: _noteController.text.isEmpty ? null : _noteController.text,
       );
 
-      final storage = await StorageService.init();
+      final storage = _storageService ?? await StorageService.init();
       await storage.addTransaction(transaction);
 
       if (mounted) {
@@ -212,13 +272,53 @@ class _AddConsumptionScreenState extends State<AddConsumptionScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     Text(
                       'Utilisez + ou - pour ajuster',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
                         fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: (_numberOfBags * 15 > _currentStock)
+                            ? Colors.red[50]
+                            : Colors.blue[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: (_numberOfBags * 15 > _currentStock)
+                              ? Colors.red[300]!
+                              : Colors.blue[300]!,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            (_numberOfBags * 15 > _currentStock)
+                                ? Icons.warning_amber
+                                : Icons.inventory_2,
+                            size: 20,
+                            color: (_numberOfBags * 15 > _currentStock)
+                                ? Colors.red[700]
+                                : Colors.blue[700],
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Stock disponible : ${_currentStock.toStringAsFixed(0)} kg',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: (_numberOfBags * 15 > _currentStock)
+                                  ? Colors.red[700]
+                                  : Colors.blue[700],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
